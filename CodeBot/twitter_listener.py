@@ -9,10 +9,10 @@ class MyStreamListener(tweepy.StreamListener):
         if status.author.id == OWNER:  # Return if I'm the poster.
             return
 
-        if status.text[:10] == '@CodeBot5 ':
-            response = status.text[10:]
+        if status.extended_tweet['full_text'][:10] == '@CodeBot5 ':
+            response = status.extended_tweet['full_text'][10:]
         else:
-            response = status.text
+            response = status.extended_tweet['full_text']
 
         print(response)
         m = hashlib.sha256()
