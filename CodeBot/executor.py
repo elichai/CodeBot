@@ -19,7 +19,9 @@ class Executor(object):
         self.TIMEOUT = 10
 
     def sanitize_code(self,code):
-        return code 
+        code = code.replace('"', '\\"')
+        print(code)
+        return code
 
     def execute(self,code,timeout = None):
         
@@ -51,7 +53,7 @@ class Executor(object):
 
             for line in container.logs(stream=True):
                 full_output +=line.decode('utf8')
-            return re.escape(full_output)
+            return full_output
 
         except Exception as e:
 
