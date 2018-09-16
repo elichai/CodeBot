@@ -1,14 +1,16 @@
 import docker
-import re
 from threading import Timer
 from threading import Thread
+
 
 def run_stopper(container,timeout):
     r = Timer(timeout, kill_container, (container,))
     r.start()
 
+
 def kill_container(container):
     container.stop()
+
 
 class Executor(object):
     
@@ -68,7 +70,7 @@ class Executor(object):
         return str(unformatted_err)[-140:].decode("utf-8") 
     
 
-#loop2 = "for i in range(0,10):print('my name is {}'.format(i));"
+# loop2 = "for i in range(0,10):print('my name is {}'.format(i));"
 def example(code):
     executor = Executor("continuumio/anaconda3")
     result = executor.execute(code,timeout = True)
