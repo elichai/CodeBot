@@ -1,6 +1,7 @@
 import tweepy
 from CodeBot.keys import OWNER
 import hashlib
+from CodeBot.executor import Executor
 
 class MyStreamListener(tweepy.StreamListener):
 
@@ -9,20 +10,30 @@ class MyStreamListener(tweepy.StreamListener):
         if status.author.id == OWNER:  # Return if I'm the poster.
             return
 
-        if status.extended_tweet['full_text'][:10] == '@CodeBot5 ':
-            response = status.extended_tweet['full_text'][10:]
+        if hasattr(status, 'extended_tweet'):
+            tweet = status.extended_tweet['full_text']
         else:
-            response = status.extended_tweet['full_text']
+            tweet = status.text
 
+        if tweet[:10] == '@CodeBot5 ':
+            response = tweet[10:]
+        else:
+            response = tweet
+
+        executeer = Executor("continuumio/anaconda3")
         print(response)
-        m = hashlib.sha256()
-        m.update(response.encode())
-        response = m.hexdigest()
+        response = executeer.execute(response, timeout=False)
+        print(response)
+        print("hi")
         response = "@" + status.author.screen_name + ' ' + response
         self.reply(response, status.id_str)
 
     def reply(self, response, id):
-        print(self.api.update_status(response, in_reply_to_status_id=id))
+        if len(response) <= 280:
+            print(self.api.update_status(response, in_reply_to_status_id=id))
+        else:
+            pass
+
 
     def on_error(self, status_code):
         if status_code == 420:
