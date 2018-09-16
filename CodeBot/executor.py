@@ -17,24 +17,20 @@ class Executor(object):
         self.container_name = container_name
         self.TIMEOUT = 10
 
-    def validate_code(self,code):
-        return True 
-
-    def execute2(self,code):
-        cmd = 'python -c """{0}"""'
-        try:
-            result = self.client.containers.run(self.container_name, 
-            command = cmd.format(code), 
-            stdout = True,
-            stderr =True,
-            pids_limit = 15)
-            return result
-        except Exception as e:
-            return self.format_error(e)
+    def sanitize_code(self,code):
+        return code 
 
     def execute(self,code,timeout = None):
         
+        code = self.sanitize_code(code)
+        
+        if code is None:
+            return None
+
         cmd = 'python -c """{0}"""'
+
+        container = None
+
         try:
 
             container = self.client.containers.run(self.container_name, 
@@ -45,6 +41,7 @@ class Executor(object):
                 privileged = False,
                 tty = True,
                 detach = True)
+
             full_output = ''
             
             if timeout is not None and timeout is True:
@@ -57,10 +54,10 @@ class Executor(object):
             return full_output
 
         except Exception as e:
-            return self.format_error(e)
 
-    def format_bytes(self,unformatted_result):
-        return unformatted_result.decode("utf-8") 
+            if container is not None:
+                container.stop()
+            return self.format_error(e)
 
     def format_error(self,unformatted_err):
         return str(unformatted_err)[-140:].decode("utf-8") 
@@ -74,7 +71,7 @@ def example(code):
 
     
 if __name__ == '__main__':
-    loop = "for i in range(0,10):print('my name is {}'.format(i));print('@@@');"
+    loop = "for i in range(0,10):print('my name is {}'.format(i));print('...');"
     bad_code = "for i in range(0,10):prinsdt('my name is {}'.format(i));"
     sleep_ = "import time;print('Start : %s' % time.ctime());time.sleep(3);print('End : %s' % time.ctime());"
-    example(sleep_)
+    example(loop)
