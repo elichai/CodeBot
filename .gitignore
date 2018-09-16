@@ -8,6 +8,7 @@ __pycache__/
 
 *.privkey
 *.pubkey
+*.token
 
 # Distribution / packaging
 .Python
