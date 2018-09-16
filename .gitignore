@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+*.privkey
+*.pubkey
+
 # Distribution / packaging
 .Python
 build/
