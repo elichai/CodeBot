@@ -1,4 +1,5 @@
 import docker
+import re
 from threading import Timer
 from threading import Thread
 
@@ -50,8 +51,7 @@ class Executor(object):
 
             for line in container.logs(stream=True):
                 full_output +=line.decode('utf8')
-
-            return full_output
+            return re.escape(full_output)
 
         except Exception as e:
 
