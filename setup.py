@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name='CodeBot',
     version='',
-    packages=find_packages(exclude=['contrib', 'docs', 'tests']),
+    packages=find_packages(exclude=['contrib', 'docs', 'tests','docker']),
     url='',
     license='',
     author='Elichai',
