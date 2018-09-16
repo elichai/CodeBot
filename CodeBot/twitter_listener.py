@@ -30,7 +30,7 @@ class MyStreamListener(tweepy.StreamListener):
 
     def reply(self, response, id):
         if len(response) <= 280:
-            print(self.api.update_status(response, in_reply_to_status_id=id))
+            self.api.update_status(response, in_reply_to_status_id=id)
         else:
             pass
 

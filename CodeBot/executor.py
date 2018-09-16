@@ -1,13 +1,17 @@
 import docker
+import re
 from threading import Timer
 from threading import Thread
+
 
 def run_stopper(container,timeout):
     r = Timer(timeout, kill_container, (container,))
     r.start()
 
+
 def kill_container(container):
     container.stop()
+
 
 class Executor(object):
     
@@ -18,7 +22,9 @@ class Executor(object):
         self.TIMEOUT = 10
 
     def sanitize_code(self,code):
-        return code 
+        code = code.replace('"', '\\"')
+        print(code)
+        return code
 
     def execute(self,code,timeout = None):
         
@@ -50,7 +56,6 @@ class Executor(object):
 
             for line in container.logs(stream=True):
                 full_output +=line.decode('utf8')
-
             return full_output
 
         except Exception as e:
@@ -66,7 +71,7 @@ class Executor(object):
         return str(unformatted_err)[-140:].decode("utf-8") 
     
 
-#loop2 = "for i in range(0,10):print('my name is {}'.format(i));"
+# loop2 = "for i in range(0,10):print('my name is {}'.format(i));"
 def example(code):
     executor = Executor("continuumio/anaconda3")
     result = executor.execute(code,timeout = True)
