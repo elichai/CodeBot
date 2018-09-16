@@ -1,28 +1,29 @@
-import base64
-import hashlib
-import hmac
-import json
+import tweepy
+from CodeBot.twitter_listener import MyStreamListener
 
-from flask import Flask
-app = Flask(__name__)
-
-with open('twitter.pubkey', 'r') as myfile:
+with open('keys/twitter.pubkey', 'r') as myfile:
     TWITTER_CONSUMER_KEY = myfile.read().replace('\n', '')
 
-with open('twitter.privkey', 'r') as myfile:
+with open('keys/twitter.privkey', 'r') as myfile:
     TWITTER_CONSUMER_SECRET = myfile.read().replace('\n', '')
 
-# Defines a route for the GET request
-@app.route('/webhooks/twitter', methods=['GET'])
-def webhook_challenge():
+with open('keys/access.token', 'r') as myfile:
+    TWITTER_ACCESS_TOKEN = myfile.read().replace('\n', '')
 
-    # creates HMAC SHA-256 hash from incomming token and your consumer secret
-    sha256_hash_digest = hmac.new(TWITTER_CONSUMER_SECRET, msg=request.args.get('crc_token'), digestmod=hashlib.sha256).digest()
+with open('keys/access-secret.token', 'r') as myfile:
+    TWITTER_ACCESS_TOKEN_SECRET = myfile.read().replace('\n', '')
 
-    # construct response data with base64 encoded hash
-    response = {
-        'response_token': 'sha256=' + base64.b64encode(sha256_hash_digest)
-    }
 
-    # returns properly formatted json response
-    return json.dumps(response)
+auth = tweepy.OAuthHandler(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET)
+auth.set_access_token(TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_TOKEN_SECRET)
+
+api = tweepy.API(auth)
+
+public_tweets = api.home_timeline()
+for tweet in public_tweets:
+    print(tweet.text)
+
+myStreamListener = MyStreamListener()
+myStream = tweepy.Stream(auth=api.auth, listener=myStreamListener)
+
+myStream.filter(follow=["1041389880046219264"])
