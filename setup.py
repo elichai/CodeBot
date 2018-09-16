@@ -9,5 +9,5 @@ setup(
     author='Elichai',
     author_email='',
     description='',
-    install_requires=['flask']
+    install_requires=['flask', 'docker']
 )
