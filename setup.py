@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='CodeBot',
     version='',
-    packages=[],
+    packages=['docker'],
     url='',
     license='',
     author='Elichai',
