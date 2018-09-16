@@ -1,4 +1,13 @@
 import docker
+from threading import Timer
+from threading import Thread
+
+def run_stopper(container,timeout):
+    r = Timer(timeout, kill_container, (container,))
+    r.start()
+
+def kill_container(container):
+    container.stop()
 
 class Executor(object):
     
@@ -6,34 +15,66 @@ class Executor(object):
     
         self.client = docker.from_env()
         self.container_name = container_name
+        self.TIMEOUT = 10
 
     def validate_code(self,code):
-    
         return True 
 
-    def execute(self,code):
+    def execute2(self,code):
         cmd = 'python -c """{0}"""'
         try:
-            result = self.client.containers.run(self.container_name, cmd.format(code), True,True)
+            result = self.client.containers.run(self.container_name, 
+            command = cmd.format(code), 
+            stdout = True,
+            stderr =True,
+            pids_limit = 15)
             return result
         except Exception as e:
             return self.format_error(e)
 
+    def execute(self,code,timeout = None):
+        
+        cmd = 'python -c """{0}"""'
+        try:
+
+            container = self.client.containers.run(self.container_name, 
+                command = cmd.format(code), 
+                stdout = True,
+                stderr =True,
+                pids_limit = 15,
+                privileged = False,
+                tty = True,
+                detach = True)
+            full_output = ''
+            
+            if timeout is not None and timeout is True:
+                thread = Thread(target = run_stopper, args = (container,self.TIMEOUT,))
+                thread.start()
+
+            for line in container.logs(stream=True):
+                full_output +=line.decode('utf8')
+
+            return full_output
+
+        except Exception as e:
+            return self.format_error(e)
+
     def format_bytes(self,unformatted_result):
-        return unformatted_result
+        return unformatted_result.decode("utf-8") 
 
     def format_error(self,unformatted_err):
-            output = str(unformatted_err)[-140:]
-        
+        return str(unformatted_err)[-140:].decode("utf-8") 
+    
+
 #loop2 = "for i in range(0,10):print('my name is {}'.format(i));"
 def example(code):
     executor = Executor("continuumio/anaconda3")
-    result = executor.execute(code)
-    pretty_result = executor.format_bytes(result)
-    print(pretty_result)
+    result = executor.execute(code,timeout = True)
+    print(result)
 
-
+    
 if __name__ == '__main__':
-    loop = "for i in range(0,10):print('my name is {}'.format(i));"
+    loop = "for i in range(0,10):print('my name is {}'.format(i));print('@@@');"
     bad_code = "for i in range(0,10):prinsdt('my name is {}'.format(i));"
-    example(loop)
+    sleep_ = "import time;print('Start : %s' % time.ctime());time.sleep(3);print('End : %s' % time.ctime());"
+    example(sleep_)
