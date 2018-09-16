@@ -1,12 +1,13 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='CodeBot',
     version='',
-    packages=[],
+    packages=find_packages(exclude=['contrib', 'docs', 'tests']),
     url='',
     license='',
     author='Elichai',
     author_email='',
-    description=''
+    description='',
+    install_requires=['flask']
 )
