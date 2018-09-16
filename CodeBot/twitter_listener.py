@@ -5,6 +5,13 @@ from CodeBot.executor import Executor
 
 class MyStreamListener(tweepy.StreamListener):
 
+    def special_handle(self, text):
+        if text == 'whoami':
+            return "@elichai2 @isan_rivkin"
+        if text == 'help':
+            return "@isan_rivkin Please Add Help"
+        return None
+
     def on_status(self, status):
         # TODO: Do something with results
         if status.author.id == OWNER:  # Return if I'm the poster.
@@ -16,13 +23,17 @@ class MyStreamListener(tweepy.StreamListener):
             tweet = status.text
 
         if tweet[:10] == '@CodeBot5 ':
-            response = tweet[10:]
+            tweet = tweet[10:]
         else:
-            response = tweet
+            tweet = tweet
+        test_special = self.special_handle(tweet)
+        if test_special is not None:
+            self.reply(test_special, status.id_str)
+            return
 
         executeer = Executor("continuumio/anaconda3")
-        print(response)
-        response = executeer.execute(response, timeout=False)
+        print(tweet)
+        response = executeer.execute(tweet, timeout=False)
         print(response)
         print("hi")
         response = "@" + status.author.screen_name + ' ' + response
