@@ -1,5 +1,4 @@
 import docker
-import re
 from threading import Timer
 from threading import Thread
 
