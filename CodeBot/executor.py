@@ -59,6 +59,9 @@ class Executor(object):
                 container.stop()
             return self.format_error(e)
 
+    def execute_async(self,code,callback,timeout = None):
+        pass
+        
     def format_error(self,unformatted_err):
         return str(unformatted_err)[-140:].decode("utf-8") 
     
