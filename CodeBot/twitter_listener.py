@@ -9,12 +9,10 @@ class MyStreamListener(tweepy.StreamListener):
         if text == 'whoami':
             return "@elichai2 @isan_rivkin"
         if text == 'help':
-            return """
-                    Who are we?
-                    tweet @CodeBot whoami
-                    Execution example:
-                    @CodeBot for i in range(0,10):print('my name is {}'.format(i));
-                    """
+            return "Who are we?\n" \
+                   "tweet @CodeBot whoami\n" \
+                   "Execution example:\n" \
+                   "@CodeBot for i in range(0,10):print('my name is {}'.format(i));"
         return None
 
     def on_status(self, status):
